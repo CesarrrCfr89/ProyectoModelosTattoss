@@ -1,0 +1,167 @@
+
+---
+title: "Proyecto"
+author: "jesusg"
+date: "2023-05-14"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+library(queueing)
+```
+Un establecimiento de tatuajes "Veneno" atiende a un cliente por vez, el establecimiento solo tiene 4 sillas para los clientes que esperan. Si el lugar se llena, los clientes irían a otra parte. Las llegadas siguen una distribución de Poisson con una media de 5 por hora. El tiempo para hacer un tatuaje es exponencial, con 20 minutos de promedio. En otro establecimiento "Taxco" funciona de la misma manera, los clientes llegan siguiendo una distribución de Poisson con una media de 3 por hora, pueden esperar en el área de espera si el artista está ocupado. El tiempo para hacer un tatuaje es exponencial, con un promedio de 15 minutos. Si el área de espera está llena, los clientes pueden esperar afuera del estudio de tatuajes. Esto significa que, para todo propósito práctico, no hay límite en el tamaño del sistema. Se desea determinar el comportamiento de ambos estudios de tatuajes.
+
+*---Establecimiento Veneno---*
+
+*Sistema : Establecimiento de tatuajes *
+*Cliente : Personas que llegan y se hacen un tatuaje*
+*Mecanismo de servicio : Los que hacen el tatuaje(1 persona)*
+*Tasa de llegada : Distrubucion Poisson(Markovchain) = 5 Clientes por hora*
+*Tiempo de servicio : Distribucion Exponencial (Markoviano) = 20 minutos promedio*
+*Numero de servidores : 1*
+
+*El tamaño del establecimiento=tamaño de la fila 6*
+
+*El modelo : (M/M/1:FIFO/5/$\infty) equivalente en R a MM1k*
+
+*---Establecimiento Taxco---*
+
+*Sistema : Lugar donde hacen tatuajes *
+*Cliente : Los que se hacen los tatuajes(personas)*
+*Mecanismo de servicio : El artista que hara los tatuajes en el lugar*
+*Tasa de llegada : Distrubucion Poisson(Markovchain) = 3 clientes por hora*
+*Tiempo de servicio : Distribucion Exponencial (Markoviano) = 15 minutos/cliente*
+*Numero de servidores : 1*
+
+*El tamaño del lugar =tamaño de la fila*
+
+*El modelo : (M/M/1:FIFO/$\infty$/$\infty) equivalente en R a MM1*
+
+```{r}
+lambda<-5 #Tasa de llegada 5 clientes/hora
+mu<-3 #Tiempo de servicio 20 min/cliente
+k<-4 #esperando
+Tatt<-NewInput.MM1K(lambda=lambda,mu=mu,k=4)
+CheckInput(Tatt)
+Tatto<-QueueingModel(Tatt)
+summary(Tatto)
+```
+
+```{r}
+#Probabilida de que existan n clientes en el sistema
+Pn(Tatto)
+```
+*La probabilidad de que los clientes se vayan ya que el establecimiento esta lleno es de 0.4337 o 43.37%*
+
+
+```{r}
+#Cantidad esperadad de clientes
+L(Tatto)
+```
+*La cantidad esperada de clientes en el sitio de tatuajes es de: 3 clientes*
+
+
+```{r}
+#Numero de clientes promedio en la cola
+Lq(Tatto)
+```
+
+*La cantidad de clientes promedio en la cola es de: 2 clientes*
+
+
+```{r}
+#Tiempo promedio en el sistema
+W(Tatto)*60
+```
+
+*El tiempo que duran en el sistema es de: 61.91 minutos*
+
+
+
+```{r}
+
+#Tiempo promedio en la cola
+Wq(Tatto)*60
+```
+*El tiempo promedio que duran en la cola es de: 41.91 minutos*
+
+
+
+
+
+```{r}
+lambda2 <- 3 #tasa de llegada 3 clientes/hora
+mu2 <- 4 #Tiempo de servicio 15 min/cliente
+
+Tatt2 <- NewInput.MM1(lambda=lambda2, mu=mu2,n=15)
+CheckInput(Tatt2)
+Tatt2o <- QueueingModel(Tatt2)
+summary(Tatt2o)
+
+```
+
+
+```{r}
+#Probabilida de que existan n clientes en el sistema
+Pn(Tatt2o)
+```
+*La probabilidad de que los clientes se vayan debido a que el tatuador de tarde y se desesperen es de 0.003340865 o 0.334%*
+
+
+
+```{r}
+#Tiempo promedio en el sistema
+W(Tatt2o)*60
+
+```
+*El tiempo que duran en el sistema es de: 60 minuto*
+
+
+
+```{r}
+#Cantidad de esperada de clientes
+L(Tatt2o)
+
+```
+
+*La cantidad esperada de clientes en el sitio de tatuajes es de: 3 clientes*
+
+
+
+
+
+```{r}
+#Numero de clientes promedio en la cola
+Lq(Tatt2o)
+```
+
+*La cantidad de clientes promedio en la cola es de: 2 clientes*
+
+
+
+```{r}
+#Tiempo promedio en la cola
+Wq(Tatt2o)*60
+```
+*El tiempo promedio que duran en la cola es de: 45 minutos*
+
+
+```{r}
+CompareQueueingModels(Tatto,Tatt2o)
+```
+
+
+
+
+
+
+
+
